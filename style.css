@@ -1,0 +1,31 @@
+h1
+{
+    font-family: '맑은 고딕';
+    font-size: 20px;
+    text-align: center;
+}
+
+p
+{
+    font-family: sans-serif;
+    color:#3c4854;
+    text-align: center;
+}
+
+.b_center 
+{
+    text-align: center;
+    color: royalblue;
+}
+
+.r_center 
+{
+    text-align: center;
+    color: maroon;
+}
+
+.g_center 
+{
+    text-align: center;
+    color:darkgreen;
+}
