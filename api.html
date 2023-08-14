@@ -19,13 +19,13 @@
 $(document).ready(function(){
         
     // 위치정보 사용가능 여부 확인
-    /* 
+     
     if ("geolocation" in navigator) {
         alert(" 지오로케이션 사용 가능 ");
     } else {
         alert(" 지오로케이션 사용 불가능 ");
     }
-    */
+    
 
     if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition);
