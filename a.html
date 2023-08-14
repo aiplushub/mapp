@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>MASK HERE</title>
+
+
+<!--  JQuery에 필요 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.css">
+<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+<script src="http://code.jquery.com/mobile/1.4.2/jquery.mobile-1.4.2.min.js"></script>
+
+<!-- 위도와 경도로 정보 받아옴 --> 
+
+<div id="map" style="width:500px;height:400px;"></div>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=57641c2e30c1d67cf80f48c90c7a1129"></script>
+<script>
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng(33.450701, 126.570667),
+        level: 3
+    };
+
+    var map = new kakao.maps.Map(container, options);
+</script>
+
+
+
+<script>
+
+$(document).ready(function(){
+        
+    // 위치정보 사용가능 여부 확인
+    /* 
+    if ("geolocation" in navigator) {
+        alert(" 지오로케이션 사용 가능 ");
+    } else {
+        alert(" 지오로케이션 사용 불가능 ");
+    }
+    //*/
+
+    if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+            alert('브라우저가 GeoLocation을 지원하지 않습니다.')
+    }
+    function showPosition(position) {
+        alert('위도: '+position.coords.latitude + ', 경도:  '+position.coords.longitude );
+        $("#latin").val(position.coords.latitude);
+        $("#lngin").val(position.coords.longitude);
+        //tinfo(position.coords.latitude, position.coords.longitude, "현위치");  
+    } 
+
+    $('#info').on('click', function() {
+        var lat = $("#latin").val();
+        var lng = $("#lngin").val();
+        tinfo(lat, lng, "입력값");
+    });  //click event end 
+
+});
+
+
+
+function tinfo(lati,longi,name) {
+    console.log(lati+", "+longi)
+    
+    var url = "https://8oi9s0nnth.apigw.ntruss.com/corona19-masks/v1/storesByGeo/json?lat="+lati+"&lng="+longi+"&m=1000"
+
+
+    $.ajax ({
+        type : "GET", //요청방식
+        url : url,  //주소
+        dataType :"JSON", //데이타타입을 JSON으로
+
+        success : function(response)  {
+            var $items = response.stores; //정보를 담고 있는 객체 추출
+            var itemsCnt = $items.length; //정보단위 갯수
+            var list = "<h1>마스크 재고 현황</h1><br />";
+            alert("검색된 상점수 : "+itemsCnt); //데이터 사이즈 확인
+
+            $.each($items,function(count,stores) {
+
+
+                var str = "";
+                var name = stores.name;
+                var addr = stores.addr;
+                var remain_stat = stores.remain_stat;
+                var stock_at = stores.stock_at;
+                str = str + "<li>상가명 : "+name+"   주소 :"+addr+"   재고 :"+remain_stat+"   입고 :"+stock_at+"</li>";
+                list = list + str;
+
+            });
+
+            $("#tinfolist").html(list);           
+        
+        }, error: function() {
+            alert("자료를 가지고 올 수 없습니다.");
+        }
+    })
+
+
+}
+
+</script>
+</head>
+
+<body> 
+
+<!--    메인 구분선   -->
+
+
+<div data-role="page" id="page">
+<div data-role="header">
+        <h1>주변 마스크 재고 현황</h1>
+</div>
+<div data-role="content" >
+
+    <div id="map" style="width:500px;height:400px;"></div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=57641c2e30c1d67cf80f48c90c7a1129"></script>
+    <script>
+		var container = document.getElementById('map');
+		var options = {
+			center: new kakao.maps.LatLng(33.450701, 126.570667),
+			level: 3
+		};
+
+		var map = new kakao.maps.Map(container, options);
+	</script>
+
+    <div>
+    <input type="text" id="latin" name='lat' autofocus width=30% size='10' style="ime-mode: active;">경도
+    <input type="text" id="lngin" name='lng' size='10' width=30% style="ime-mode: active;">위도
+    <button id="info" style="cursor: hand">INFO</button>
+    </div>
+
+    <div>
+    정자역 <br />
+    37.367090, 127.108319<br />
+    <a href="#" data-icon="check" onclick='javascript:tinfo(37.367090, 127.108319, "정자역")'>정자역</a>
+    <br />
+    <br />
+    수내역<br />
+    37.378549, 127.114397<br />
+    <a href="#" data-icon="check" onclick='javascript:tinfo(37.378549, 127.114397, "수내역")'>수내역</a>
+    <br />
+    <br />
+    동천역<br />
+    37.338063, 127.102875<br />
+    <a href="#" data-icon="check" onclick='javascript:tinfo(37.338063, 127.102875, "동천역")'>동천역</a>
+    <br />
+    <br />
+    강남역<br />
+    37.498070, 127.027610<br />
+    <a href="#" data-icon="check" onclick='javascript:tinfo(37.498070, 127.027610, "강남역")'>강남역</a>    
+    </div>
+    <br />
+
+
+
+    =========================================================
+    <br />
+    <div id="tinfolist">
+    </div>
+    <br />
+
+</div>   
+<div data-role="footer">
+</div>
+</div>
+
+<!--    메인 구분선   -->
+
+</body> 
+</html>
