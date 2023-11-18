@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+
+<!--  JQuery에 필요 -->
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<title>지역별 미세먼지 정보</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<!-- 입력값을 파다메터로 활용 --> 
+
+<style>
+table,th,td {
+    border:1px solid black;
+    border-collapse:collapse;
+    text-align: center;
+}
+
+body {
+    overflow-y: scroll;
+}
+</style>
+<script>
+$(document).ready(function(){
+        
+    $('#info').on('click', function() {
+        var city = $("#city").val();
+        info(city);
+
+    });  //click event end 
+
+});
+
+function info(city) {
+    console.log(city)
+    
+    var url = "https://apis.data.go.kr/B552584/ArpltnInforInqireSvc/getCtprvnRltmMesureDnsty?serviceKey=1245EPhCcImdF%2FtM21AZmSt9qOI2Ks5vIs4FxC4%2BSAUfteQ6FLShUCY81a6S23GPQ9SNURGrdRpsve%2BvxQLgJQ%3D%3D&returnType=xml&numOfRows=1000&ver=1.4&sidoName="+city;
+
+    $.ajax ({
+        type : "GET", //요청방식
+        url : url,  //주소
+        dataType :"xml", //데이타타입
+        success : function(response)  {
+
+            $items = $(response).find("item"); //item 태그 아래 데이터를 items 객체로 생성
+            //return count
+                var itemsCnt = $items.length; //정보단위 갯수
+                var tm = $($items[0]).find("dataTime").text();
+                var list = "<h3>"+city+" 지역 대기정보 <br />"+tm+"</h3>";
+                list += "<TABLE><TR>";
+                list += "<TD>지역명</TD>";
+                list += "<TD>아황산가스</TD>";
+                list += "<TD>일산화탄소</TD>";
+                list += "<TD>오존</TD>";
+                list += "<TD>이산화질소</TD>";
+                list += "<TD>미세먼지</TD>";
+                list += "<TD>초미세먼지</TD>";
+                list += "<TD>미세먼지 24h등급</TD>";
+                list += "<TD>초미세먼지 24h등급</TD>";
+                list += "<TD>미세먼지 1h등급</TD>";
+                list += "<TD>초미세먼지 1h등급</TD>";
+                list += "</TR>";
+            //    alert(itemsCnt);
+
+            //타임라인 갯수만큼 루프 돈다.
+            $items.each(function (){
+            /*find함수로 각각의 노드값을 구한다.*/
+                var str = "<TR BOR>";
+                var dataTime = $(this).find("dataTime").text();
+                var stationName = $(this).find("stationName").text();
+                var so2Value = $(this).find("so2Value").text();
+                var coValue = $(this).find("coValue").text();
+                var o3Value = $(this).find("o3Value").text();
+                var no2Value = $(this).find("no2Value").text();
+                var pm10Value = $(this).find("pm10Value").text();
+                var pm25Value = $(this).find("pm25Value").text();
+                var pm10Grade = $(this).find("pm10Grade").text();
+                var pm25Grade = $(this).find("pm25Grade").text();
+                var pm10Grade1h = $(this).find("pm10Grade1h").text();
+                var pm25Grade1h = $(this).find("pm25Grade1h").text();
+
+                function getGrade(param) {
+                // 파라미터가 1인 경우
+                if (param == 1) {
+                    return "Good";
+                    }
+                // 파라미터가 2인 경우
+                    else if (param == 2) {
+                    return "OK";
+                     }
+                // 파라미터가 3인 경우
+                    else if (param == 3) {
+                       return "Bad";
+                     }
+                // 파라미터가 4인 경우
+                    else if (param == 4) {
+                       return "Very Bad";
+                     }
+                // 파라미터가 1, 2, 3, 4가 아닌 경우
+                    else {
+                       return "invalid parameter";
+                     }
+                }
+
+                pm10Grade = getGrade(pm10Grade);
+                pm25Grade = getGrade(pm25Grade);
+                pm10Grade1h = getGrade(pm10Grade1h);
+                pm25Grade1h = getGrade(pm25Grade1h);
+
+                str += "<TD>"+stationName+"</TD>";
+                str += "<TD>"+so2Value+"</TD>";
+                str += "<TD>"+coValue+"</TD>";
+                str += "<TD>"+o3Value+"</TD>";
+                str += "<TD>"+no2Value+"</TD>";
+                str += "<TD>"+pm10Value+"</TD>";
+                str += "<TD>"+pm25Value+"</TD>";
+                str += "<TD>"+pm10Grade+"</TD>";
+                str += "<TD>"+pm25Grade+"</TD>";
+                str += "<TD>"+pm10Grade1h+"</TD>";
+                str += "<TD>"+pm25Grade1h+"</TD>";
+                str += "</TR>";
+
+                list = list + str;
+            })
+
+            list += "</TABLE>";
+
+            $("#localdust").html(list);
+        
+        }, error: function() {
+            alert("자료를 가지고 올 수 없습니다.");
+        }
+    })
+
+}
+
+</script>
+</head>
+
+<body>
+<CENTER> 
+
+<!--    메인 구분선   -->
+
+
+<div data-role="page" id="page">
+<div data-role="header">
+<h2>지역별 미세먼지</h2>
+</div>
+<div data-role="content" >
+
+    <div>
+        <select id="city" >
+               <option value="서울" selected="selected">서울</option>
+               <option value="경기">경기</option>
+               <option value="강원">강원</option>
+               <option value="부산">부산</option>
+               <option value="대구">대구</option>
+               <option value="인천">인천</option>
+               <option value="광주">광주</option>
+               <option value="대전">대전</option>
+               <option value="울산">울산</option>
+               <option value="충북">충북</option>
+               <option value="충남">충남</option>
+               <option value="전북">전북</option>
+               <option value="전남">전남</option>
+               <option value="경북">경북</option>
+               <option value="경남">경남</option>
+               <option value="제주">제주</option>
+               <option value="세종">세종</option>
+               <option value="전국">전국</option>
+        </select>
+        <button id="info" style="cursor: hand">조회</button>
+    </div>
+
+    <div id="localdust">
+    </div>
+    <br />
+
+</div>   
+<div data-role="footer">
+</div>
+
+<!--    메인 구분선   -->
+</CENTER>
+</body> 
+</html>

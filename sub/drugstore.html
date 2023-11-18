@@ -1,0 +1,155 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+
+<!--  JQuery에 필요 -->
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<title>지역별 약국 정보</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+<!-- 입력값을 파다메터로 활용 --> 
+
+<style>
+table,th,td {
+    border:1px solid black;
+    border-collapse:collapse;
+    text-align: center;
+}
+
+body {
+    overflow-y: scroll;
+}
+</style>
+<script>
+$(document).ready(function(){
+        
+    $('#info').on('click', function() {
+        var city = $("#city").val();
+        info(city);
+
+    });  //click event end 
+
+});
+
+function info(city) {
+    console.log(city)
+    
+    var url = "https://apis.data.go.kr/B552657/ErmctInsttInfoInqireService/getParmacyListInfoInqire?serviceKey=1245EPhCcImdF%2FtM21AZmSt9qOI2Ks5vIs4FxC4%2BSAUfteQ6FLShUCY81a6S23GPQ9SNURGrdRpsve%2BvxQLgJQ%3D%3D&ORD=NAME&pageNo=1&numOfRows=10&Q0="+city;
+
+    alert(url);
+    $.ajax ({
+        type : "GET", //요청방식
+        url : url,  //주소
+        dataType :"xml", //데이타타입
+
+        success : function(response)  {
+
+            $items = $(response).find("item"); //item 태그 아래 데이터를 items 객체로 생성
+            //return count
+                var itemsCnt = $items.length; //정보단위 갯수
+                var list = "<h3>지역별 약국정보</h3>";
+                list += "<TABLE><TR>";
+                list += "<TD>주소</TD>";
+                list += "<TD>추가설명</TD>";
+                list += "<TD>약국명</TD>";
+                list += "<TD>전화번호</TD>";
+                list += "<TD>오존</TD>";
+                list += "<TD>이산화질소</TD>";
+                list += "<TD>순번</TD>";
+                list += "<TD>경도</TD>";
+                list += "<TD>위도</TD>";
+                list += "</TR>";
+            //    alert(itemsCnt);
+
+            //타임라인 갯수만큼 루프 돈다.
+            $items.each(function (){
+            /*find함수로 각각의 노드값을 구한다.*/
+                var str = "<TR BOR>";
+                var dutyAddr = $(this).find("dutyAddr").text();
+                var dutyMapimg = $(this).find("dutyMapimg").text();
+                var dutyName = $(this).find("dutyName").text();
+                var dutyTel1 = $(this).find("dutyTel1").text();
+                var postCdn1 = $(this).find("postCdn1").text();
+                var postCdn2 = $(this).find("postCdn2").text();
+                var rnum = $(this).find("rnum").text();
+                var wgs84Lat = $(this).find("wgs84Lat").text();
+                var wgs84Lon = $(this).find("wgs84Lon").text();
+
+                str += "<TD>"+dutyAddr+"</TD>";
+                str += "<TD>"+dutyMapimg+"</TD>";
+                str += "<TD>"+dutyName+"</TD>";
+                str += "<TD>"+dutyTel1+"</TD>";
+                str += "<TD>"+postCdn1+"</TD>";
+                str += "<TD>"+postCdn2+"</TD>";
+                str += "<TD>"+rnum+"</TD>";
+                str += "<TD>"+wgs84Lat+"</TD>";
+                str += "<TD>"+wgs84Lon+"</TD>";
+                str += "</TR>";
+
+                list = list + str;
+            })
+
+            list += "</TABLE>";
+
+            $("#drugstore").html(list);
+        
+        }, error: function() {
+            alert("자료를 가지고 올 수 없습니다.");
+        }
+    })
+
+}
+
+</script>
+</head>
+
+<body>
+<CENTER> 
+
+<!--    메인 구분선   -->
+
+
+<div data-role="page" id="page">
+<div data-role="header">
+<h2>지역별 약국정보</h2>
+</div>
+<div data-role="content" >
+
+    <div>
+        <select id="city" >
+               <option value="서울" selected="selected">서울</option>
+               <option value="경기">경기</option>
+               <option value="강원">강원</option>
+               <option value="부산">부산</option>
+               <option value="대구">대구</option>
+               <option value="인천">인천</option>
+               <option value="광주">광주</option>
+               <option value="대전">대전</option>
+               <option value="울산">울산</option>
+               <option value="충청북도">충북</option>
+               <option value="충청남도">충남</option>
+               <option value="전라북도">전북</option>
+               <option value="전라남도">전남</option>
+               <option value="경상북도">경북</option>
+               <option value="경상남도">경남</option>
+               <option value="제주">제주</option>
+               <option value="세종">세종</option>
+               <option value="전국">전국</option>
+        </select>
+        <button id="info" style="cursor: hand">조회</button>
+    </div>
+
+    <div id="drugstore">
+    </div>
+    <br />
+
+</div>   
+<div data-role="footer">
+</div>
+
+<!--    메인 구분선   -->
+</CENTER>
+</body> 
+</html>

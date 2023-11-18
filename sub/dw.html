@@ -1,0 +1,137 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+
+<!--  JQuery에 필요 -->
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+
+<title>주변약국</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<style>
+    table,th,td {
+        border:1px solid gray;
+        border-collapse:collapse;
+        text-align: center;
+    }
+    
+    body {
+        overflow-y: scroll;
+    }
+    </style>
+
+<!-- 입력값을 파다메터로 활용 --> 
+
+<script>
+$(document).ready(function(){
+        
+    $('#info').on('click', function() {
+        var input1 = $("#input1").val();
+        var input2 = $("#input2").val();
+        var input3 = $("#input3").val();
+        info(input1,input2,input3);
+    });  //click event end 
+
+});
+
+function info(input1,input2,input3) {
+    console.log(input1+", "+input2+", "+input3)
+
+    var skey = "1245EPhCcImdF%2FtM21AZmSt9qOI2Ks5vIs4FxC4%2BSAUfteQ6FLShUCY81a6S23GPQ9SNURGrdRpsve%2BvxQLgJQ%3D%3D"
+    var url = 'http://apis.data.go.kr/B551182/pharmacyInfoService/getParmacyBasisList'; /*URL*/
+    
+    var url = "https://apis.data.go.kr/B551182/pharmacyInfoService/getParmacyBasisList?serviceKey=1245EPhCcImdF%2FtM21AZmSt9qOI2Ks5vIs4FxC4%2BSAUfteQ6FLShUCY81a6S23GPQ9SNURGrdRpsve%2BvxQLgJQ%3D%3D&pageNo=1&numOfRows=10&xPos=127.0965441345503&yPos=37.60765568913871&radius=3000"
+
+    $.ajax ({
+        type : "GET", //요청방식
+        url : url,  //주소
+        dataType :"xml", //데이타타입
+        success : function(response)  {
+
+            $items = $(response).find("item"); //item 태그 아래 데이터를 items 객체로 생성
+            //return count
+                var itemsCnt = $items.length; //정보단위 갯수
+                alert(url);
+
+                var list = "<h1>약국 정보</h1><br />";
+                list += "<TABLE><TR>";
+                list += "<TD>약국명</TD>";
+                list += "<TD>약국주소</TD>";
+                list += "<TD>연락처</TD>";
+                list += "<TD>링크</TD>";
+                list += "<TD>거리</TD>";
+                list += "</TR>";
+
+            //타임라인 갯수만큼 루프 돈다.
+            $items.each(function (){
+            /*find함수로 각각의 노드값을 구한다.*/
+                var str = "";
+
+                var yadmNm = $(this).find("yadmNm").text();
+                var addr = $(this).find("addr").text();
+                var telno = $(this).find("telno").text();
+                var distance = $(this).find("distance").text();
+                var XPos = $(this).find("XPos").text();
+                var YPos = $(this).find("YPos").text();
+                alert(XPos+"11111111111"+YPos);
+                var dlink = "https://map.kakao.com/link/map/"+yadmNm+","+XPos+","+YPos;
+
+                alert(yadmNm);
+
+                var str = "<TR BOR>";                
+                str += "<TD>"+yadmNm+"</TD>";
+                str += "<TD>"+addr+"</TD>";
+                str += "<TD>"+telno+"</TD>";
+                str += "<TD><a href="+dlink+"  target="+"_blank"+">지도</a></TD>";
+                str += "<TD>"+distance+"</TD>";
+                str += "</TR>";
+            
+                list = list + str;
+
+            })
+
+            alert(list);
+
+            $("#infolist").html(list);
+        
+        }, error: function() {
+            alert("자료를 가지고 올 수 없습니다.");
+        }
+    })
+
+}
+
+</script>
+</head>
+
+<body> 
+
+<!--    메인 구분선   -->
+
+
+<div data-role="page" id="page">
+<div data-role="header">
+<h1>API 테스트</h1>
+</div>
+<div data-role="content" >
+    
+    <div>
+    <input type="text" id="n_page" name='n_page' size='10' width=30% style="ime-mode: active;">입력1
+    <input type="text" id="n_row" name='n_row' size='10' width=30% style="ime-mode: active;">입력2
+    <input type="text" id="input3" name='input3' size='10' width=30% style="ime-mode: active;">입력3
+    <button id="info" style="cursor: hand">INFO</button>
+    </div>
+
+    <div id="infolist">
+    </div>
+
+</div>   
+<div data-role="footer">
+</div>
+</div>
+
+<!--    메인 구분선   -->
+
+</body> 
+</html>
